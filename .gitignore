@@ -1,0 +1,11 @@
+
+/bin
+/src/res/*.aps
+/win/*.ncb
+/win/*.suo
+/win/*.user
+/win/*.sdf
+/win/Debug
+/win/Release
+/win/ipch
+/win/*.opensdf
