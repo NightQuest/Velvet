@@ -27,7 +27,7 @@ BOOL WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	wcx.hIcon			= LoadIcon(hInstance, IDI_APPLICATION);
 	wcx.hCursor			= LoadCursor(NULL, IDC_ARROW);
 	wcx.hbrBackground	= (HBRUSH)(COLOR_WINDOW + 1);
-	wcx.lpszMenuName	= NULL;
+	wcx.lpszMenuName	= MAKEINTRESOURCE(IDR_MAIN_MENU);
 	wcx.lpszClassName	= sz_ClassName;
 	wcx.hIconSm			= (HICON)LoadImage(hInstance, IDI_APPLICATION, IMAGE_ICON, GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR);
 
@@ -44,7 +44,7 @@ BOOL WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	// Create our main window
 	HWND hwndMain = CreateWindowEx(NULL,
 		sz_ClassName, _T("Velvet"),
-		WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
+		WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX,
 		((GetSystemMetrics(SM_CXSCREEN)/2)-(width/2)), ((GetSystemMetrics(SM_CYSCREEN)/2)-(height/2)), // centered
 		width, height,
 		NULL, NULL, hInstance, NULL);

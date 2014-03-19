@@ -24,6 +24,9 @@
     <ClInclude Include="..\src\DBCFile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\res\resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\preCompiled.cpp">
@@ -35,5 +38,10 @@
     <ClCompile Include="..\src\DBCFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\src\res\Velvet.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

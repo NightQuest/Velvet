@@ -11,6 +11,8 @@
 #include <map>
 using namespace std;
 
+#include "resource.h"
+
 typedef std::basic_string<TCHAR, char_traits<TCHAR>, allocator<TCHAR> > tstring;
 #ifdef UNICODE
 #define to_tstring to_wstring
