@@ -1,6 +1,8 @@
 #include "preCompiled.h"
 
 const TCHAR sz_ClassName[] = _T("VelvetAppWC");
+HWND hwndMain = 0;
+HACCEL hAccTable = 0;
 
 // Main program function - called when the program starts
 BOOL WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -16,6 +18,14 @@ BOOL WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	icce.dwICC = ICC_STANDARD_CLASSES | ICC_LISTVIEW_CLASSES;
 	if( !InitCommonControlsEx(&icce) )
 		return TRUE;
+
+	// Load our Accelerators
+	hAccTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_MAIN_MENU_ACCELERATOR));
+	if( !hAccTable )
+	{
+		MessageBox(NULL, _T("Unable to load Accelerators!"), _T("Error!"), MB_ICONERROR | MB_OK);
+		return TRUE;
+	}
 
 	// Fill wcx with our main window's class information.
 	wcx.cbSize			= sizeof(WNDCLASSEX);
@@ -42,7 +52,7 @@ BOOL WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	int width = 300;
 
 	// Create our main window
-	HWND hwndMain = CreateWindowEx(NULL,
+	hwndMain = CreateWindowEx(NULL,
 		sz_ClassName, _T("Velvet"),
 		WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX,
 		((GetSystemMetrics(SM_CXSCREEN)/2)-(width/2)), ((GetSystemMetrics(SM_CYSCREEN)/2)-(height/2)), // centered
@@ -55,6 +65,7 @@ BOOL WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 		return TRUE;
 	}
 
+
 	// Display and draw our main window
 	ShowWindow(hwndMain, nCmdShow);
 	UpdateWindow(hwndMain);
@@ -62,8 +73,11 @@ BOOL WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	// The main message loop
 	while( (bRet = GetMessage(&msg, NULL, 0, 0)) != 0 && bRet != -1 )
 	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
+		if( !TranslateAccelerator(hwndMain, hAccTable, &msg) )
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
 	}
 
 	return msg.wParam;
@@ -74,6 +88,40 @@ LRESULT CALLBACK MainWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 {
 	switch(msg)
 	{
+	case WM_COMMAND:
+		switch(LOWORD(wParam))
+		{
+		case IDM_FILE_EXIT:
+			PostQuitMessage(0);
+			break;
+
+		case IDM_FILE_OPEN:
+			{
+				vector<TCHAR> filename(1024);
+				OPENFILENAME ofn;
+				memset(&ofn, 0, sizeof(OPENFILENAME));
+				ofn.lStructSize	= sizeof(OPENFILENAME);
+				ofn.hwndOwner	= hwndMain;
+				ofn.lpstrFilter	= _T("DBC Files (*.dbc)\0*.dbc\0All (*.*)\0*.*\0\0");
+				ofn.lpstrFile	= &filename[0];
+				ofn.nMaxFile	= filename.size();
+
+				if( GetOpenFileName(&ofn) != 0 )
+				{
+					DBCFile dbc;
+					if( dbc.open(&filename[0]) )
+					{
+						tstringstream ss;
+						ss	<< _T("Rows: ") << to_tstring(dbc.getHeader().rows) << _T("\r\n")
+							<< _T("Columns: ") << to_tstring(dbc.getHeader().columns) << _T("\r\n");
+
+						MessageBox(hwndMain, ss.str().c_str(), _T("DBC Information"), MB_ICONINFORMATION | MB_OK);
+					}
+				}
+			}
+		}
+		break;
+
 	case WM_CLOSE:
 		DestroyWindow(hwnd);
 		break;
