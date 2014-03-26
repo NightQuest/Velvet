@@ -56,5 +56,6 @@ public:
 	void setColumnFormat(const tstring& format);
 	DBCHeader getHeader() { return fileHeader; }
 	DBCRow* getRow(unsigned int row);
+	DBCRow* getRowById(unsigned int id);
 	const char* getString(unsigned int offset) { return reinterpret_cast<const char*>(stringTable + offset); }
 };

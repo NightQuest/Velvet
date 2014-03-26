@@ -142,7 +142,7 @@ void DBCFile::setColumnFormat(const tstring& format)
 			columnFormat[x].size = 1;
 		else if( format[x] == _T('s') )
 			columnFormat[x].size = 2;
-		else if( format[x] == _T('i') )
+		else if( format[x] == _T('i') || format[x] == _T('f') )
 			columnFormat[x].size = 4;
 
 		if( x > 0 )
@@ -165,4 +165,15 @@ DBCRow* DBCFile::getRow(unsigned int row)
 		return nullptr;
 
 	return itr->second;
+}
+
+DBCRow* DBCFile::getRowById(unsigned int id)
+{
+	for( auto row : rows )
+	{
+		if( row.second->getColumn<unsigned int>(0) == id )
+			return row.second;
+	}
+
+	return nullptr;
 }
