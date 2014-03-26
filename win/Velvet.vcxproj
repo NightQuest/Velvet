@@ -89,6 +89,7 @@
     <ClInclude Include="..\src\DBCFile.h" />
     <ClInclude Include="..\src\preCompiled.h" />
     <ClInclude Include="..\src\res\resource.h" />
+    <ClInclude Include="..\src\tcharness.h" />
     <ClInclude Include="..\src\Velvet.h" />
   </ItemGroup>
   <ItemGroup>
