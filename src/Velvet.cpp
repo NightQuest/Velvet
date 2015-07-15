@@ -1,7 +1,8 @@
 #include "preCompiled.h"
 
 const TCHAR sz_ClassName[] = _T("VelvetAppWC");
-HWND hwndMain = 0;
+HWND hwndMain = 0, hwndStatusbar = 0;
+HINSTANCE hInst;
 HACCEL hAccTable = 0;
 
 // Main program function - called when the program starts
@@ -12,10 +13,12 @@ BOOL WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	BOOL bRet;
 	MSG msg;
 
+	hInst = hInstance;
+
 	// Register which window classes we'll be using
 	memset(&icce, 0, sizeof(INITCOMMONCONTROLSEX));
 	icce.dwSize = sizeof(INITCOMMONCONTROLSEX);
-	icce.dwICC = ICC_STANDARD_CLASSES | ICC_LISTVIEW_CLASSES;
+	icce.dwICC = ICC_BAR_CLASSES | ICC_LISTVIEW_CLASSES;
 	if( !InitCommonControlsEx(&icce) )
 		return TRUE;
 
@@ -36,10 +39,10 @@ BOOL WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	wcx.hInstance		= hInstance;
 	wcx.hIcon			= LoadIcon(hInstance, IDI_APPLICATION);
 	wcx.hCursor			= LoadCursor(NULL, IDC_ARROW);
-	wcx.hbrBackground	= (HBRUSH)(COLOR_WINDOW + 1);
+	wcx.hbrBackground	= reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1);
 	wcx.lpszMenuName	= MAKEINTRESOURCE(IDR_MAIN_MENU);
 	wcx.lpszClassName	= sz_ClassName;
-	wcx.hIconSm			= (HICON)LoadImage(hInstance, IDI_APPLICATION, IMAGE_ICON, GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR);
+	wcx.hIconSm			= reinterpret_cast<HICON>(LoadImage(hInstance, IDI_APPLICATION, IMAGE_ICON, GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR));
 
 	// Register our main window's class
 	if( !RegisterClassEx(&wcx) )
@@ -48,13 +51,13 @@ BOOL WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 		return TRUE;
 	}
 
-	int height = 200;
-	int width = 300;
+	int height = 600;
+	int width = 900;
 
 	// Create our main window
 	hwndMain = CreateWindowEx(NULL,
 		sz_ClassName, _T("Velvet"),
-		WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX,
+		WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_THICKFRAME,
 		((GetSystemMetrics(SM_CXSCREEN)/2)-(width/2)), ((GetSystemMetrics(SM_CYSCREEN)/2)-(height/2)), // centered
 		width, height,
 		NULL, NULL, hInstance, NULL);
@@ -64,7 +67,6 @@ BOOL WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 		MessageBox( NULL, _T("Window Creation Failed!"), _T("Error!"), MB_ICONERROR | MB_OK );
 		return TRUE;
 	}
-
 
 	// Display and draw our main window
 	ShowWindow(hwndMain, nCmdShow);
@@ -88,6 +90,35 @@ LRESULT CALLBACK MainWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 {
 	switch(msg)
 	{
+	case WM_CREATE:
+		{
+			hwndStatusbar = CreateWindowEx(NULL,
+				STATUSCLASSNAME, NULL,
+				WS_CHILD | WS_VISIBLE | SBARS_SIZEGRIP,
+				NULL, NULL,
+				NULL, NULL,
+				hwnd, NULL, hInst, NULL);
+
+			SendMessage(hwndStatusbar, WM_SETFONT, reinterpret_cast<WPARAM>(GetStockObject(DEFAULT_GUI_FONT)), TRUE);
+		}
+		break;
+
+	case WM_SIZE:
+		SendMessage(hwndStatusbar, WM_SIZE, 0, 0);
+		break;
+
+	case WM_SHOWWINDOW:
+		{
+			int statwidths[] = { 100, 200, 300, -1 };
+
+			SendMessage(hwndStatusbar, SB_SETPARTS, 4, reinterpret_cast<LPARAM>(statwidths));
+			SendMessage(hwndStatusbar, SB_SETTEXT, 0|SBT_NOBORDERS, reinterpret_cast<LPARAM>(_T("")));
+			SendMessage(hwndStatusbar, SB_SETTEXT, 1|SBT_NOBORDERS, reinterpret_cast<LPARAM>(_T("")));
+			SendMessage(hwndStatusbar, SB_SETTEXT, 2|SBT_NOBORDERS, reinterpret_cast<LPARAM>(_T("")));
+			SendMessage(hwndStatusbar, SB_SETTEXT, 3|SBT_NOBORDERS, reinterpret_cast<LPARAM>(_T("")));
+		}
+		break;
+
 	case WM_COMMAND:
 		switch(LOWORD(wParam))
 		{
@@ -111,12 +142,15 @@ LRESULT CALLBACK MainWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 					DBCFile dbc;
 					if( dbc.open(&filename[0]) )
 					{
-						tstringstream ss;
-						ss	<< _T("Rows: ") << to_tstring(dbc.getHeader().rows) << _T("\r\n")
-							<< _T("Columns: ") << to_tstring(dbc.getHeader().columns) << _T("\r\n");
+						DBCHeader header = dbc.getHeader();
 
-						MessageBox(hwndMain, ss.str().c_str(), _T("DBC Information"), MB_ICONINFORMATION | MB_OK);
+						SendMessage(hwndStatusbar, SB_SETTEXT, 0|SBT_NOBORDERS, reinterpret_cast<LPARAM>(((_T("Rows: ") + to_tstring(header.rows)).c_str())));
+						SendMessage(hwndStatusbar, SB_SETTEXT, 1|SBT_NOBORDERS, reinterpret_cast<LPARAM>(((_T("Columns: ") + to_tstring(header.columns)).c_str())));
+						SendMessage(hwndStatusbar, SB_SETTEXT, 2|SBT_NOBORDERS, reinterpret_cast<LPARAM>(((_T("Row Size: ") + to_tstring(header.rowSize) + _T("B")).c_str())));
+						SendMessage(hwndStatusbar, SB_SETTEXT, 3 | SBT_NOBORDERS, reinterpret_cast<LPARAM>(((_T("String Table Size: ") + to_tstring(header.stringTableSize) + _T("B")).c_str())));
 					}
+					else
+						MessageBox(hwndMain, _T("This is not a valid DBC file."), _T("Error!"), MB_ICONERROR | MB_OK);
 				}
 			}
 		}
