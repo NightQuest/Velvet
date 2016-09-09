@@ -1,4 +1,5 @@
 #include <tchar.h>
+#include <iterator>
 
 #define _TLLFMT	_T("%I64")
 #define _TOTSTRING(buf, fmt, val)	\
