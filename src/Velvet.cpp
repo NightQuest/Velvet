@@ -1,6 +1,6 @@
 #include "preCompiled.h"
 
-const TCHAR sz_ClassName[] = _T("VelvetAppWC");
+const wchar_t sz_ClassName[] = L"VelvetAppWC";
 HWND hwndMain = 0, hwndStatusbar = 0;
 HINSTANCE hInst;
 HACCEL hAccTable = 0;
@@ -26,7 +26,7 @@ BOOL WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	hAccTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_MAIN_MENU_ACCELERATOR));
 	if( !hAccTable )
 	{
-		MessageBox(NULL, _T("Unable to load Accelerators!"), _T("Error!"), MB_ICONERROR | MB_OK);
+		MessageBox(NULL, L"Unable to load Accelerators!", L"Error!", MB_ICONERROR | MB_OK);
 		return TRUE;
 	}
 
@@ -47,7 +47,7 @@ BOOL WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	// Register our main window's class
 	if( !RegisterClassEx(&wcx) )
 	{
-		MessageBox( NULL, _T("Window Registration Failed!"), _T("Error!"), MB_ICONERROR | MB_OK );
+		MessageBox( NULL, L"Window Registration Failed!", L"Error!", MB_ICONERROR | MB_OK );
 		return TRUE;
 	}
 
@@ -56,7 +56,7 @@ BOOL WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 
 	// Create our main window
 	hwndMain = CreateWindowEx(NULL,
-		sz_ClassName, _T("Velvet"),
+		sz_ClassName, L"Velvet",
 		WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_THICKFRAME,
 		((GetSystemMetrics(SM_CXSCREEN)/2)-(width/2)), ((GetSystemMetrics(SM_CYSCREEN)/2)-(height/2)), // centered
 		width, height,
@@ -64,7 +64,7 @@ BOOL WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 
 	if( !hwndMain )
 	{
-		MessageBox( NULL, _T("Window Creation Failed!"), _T("Error!"), MB_ICONERROR | MB_OK );
+		MessageBox( NULL, L"Window Creation Failed!", L"Error!", MB_ICONERROR | MB_OK );
 		return TRUE;
 	}
 
@@ -112,10 +112,10 @@ LRESULT CALLBACK MainWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 			int statwidths[] = { 100, 200, 300, -1 };
 
 			SendMessage(hwndStatusbar, SB_SETPARTS, 4, reinterpret_cast<LPARAM>(statwidths));
-			SendMessage(hwndStatusbar, SB_SETTEXT, 0|SBT_NOBORDERS, reinterpret_cast<LPARAM>(_T("")));
-			SendMessage(hwndStatusbar, SB_SETTEXT, 1|SBT_NOBORDERS, reinterpret_cast<LPARAM>(_T("")));
-			SendMessage(hwndStatusbar, SB_SETTEXT, 2|SBT_NOBORDERS, reinterpret_cast<LPARAM>(_T("")));
-			SendMessage(hwndStatusbar, SB_SETTEXT, 3|SBT_NOBORDERS, reinterpret_cast<LPARAM>(_T("")));
+			SendMessage(hwndStatusbar, SB_SETTEXT, 0|SBT_NOBORDERS, reinterpret_cast<LPARAM>(L""));
+			SendMessage(hwndStatusbar, SB_SETTEXT, 1|SBT_NOBORDERS, reinterpret_cast<LPARAM>(L""));
+			SendMessage(hwndStatusbar, SB_SETTEXT, 2|SBT_NOBORDERS, reinterpret_cast<LPARAM>(L""));
+			SendMessage(hwndStatusbar, SB_SETTEXT, 3|SBT_NOBORDERS, reinterpret_cast<LPARAM>(L""));
 		}
 		break;
 
@@ -128,12 +128,12 @@ LRESULT CALLBACK MainWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 
 		case IDM_FILE_OPEN:
 			{
-				vector<TCHAR> filename(1024);
+				std::vector<wchar_t> filename(1024);
 				OPENFILENAME ofn;
 				memset(&ofn, 0, sizeof(OPENFILENAME));
 				ofn.lStructSize	= sizeof(OPENFILENAME);
 				ofn.hwndOwner	= hwndMain;
-				ofn.lpstrFilter	= _T("DBC Files (*.dbc)\0*.dbc\0All (*.*)\0*.*\0\0");
+				ofn.lpstrFilter	= L"DBC Files (*.dbc)\0*.dbc\0All (*.*)\0*.*\0\0";
 				ofn.lpstrFile	= &filename[0];
 				ofn.nMaxFile	= filename.size();
 
@@ -144,13 +144,13 @@ LRESULT CALLBACK MainWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 					{
 						DBCHeader header = dbc.getHeader();
 
-						SendMessage(hwndStatusbar, SB_SETTEXT, 0|SBT_NOBORDERS, reinterpret_cast<LPARAM>(((_T("Rows: ") + to_tstring(header.rows)).c_str())));
-						SendMessage(hwndStatusbar, SB_SETTEXT, 1|SBT_NOBORDERS, reinterpret_cast<LPARAM>(((_T("Columns: ") + to_tstring(header.columns)).c_str())));
-						SendMessage(hwndStatusbar, SB_SETTEXT, 2|SBT_NOBORDERS, reinterpret_cast<LPARAM>(((_T("Row Size: ") + to_tstring(header.rowSize) + _T("B")).c_str())));
-						SendMessage(hwndStatusbar, SB_SETTEXT, 3 | SBT_NOBORDERS, reinterpret_cast<LPARAM>(((_T("String Table Size: ") + to_tstring(header.stringTableSize) + _T("B")).c_str())));
+						SendMessage(hwndStatusbar, SB_SETTEXT, 0|SBT_NOBORDERS, reinterpret_cast<LPARAM>(((L"Rows: " + std::to_wstring(header.rows)).c_str())));
+						SendMessage(hwndStatusbar, SB_SETTEXT, 1|SBT_NOBORDERS, reinterpret_cast<LPARAM>(((L"Columns: " + std::to_wstring(header.columns)).c_str())));
+						SendMessage(hwndStatusbar, SB_SETTEXT, 2|SBT_NOBORDERS, reinterpret_cast<LPARAM>(((L"Row Size: " + std::to_wstring(header.rowSize) + L"B").c_str())));
+						SendMessage(hwndStatusbar, SB_SETTEXT, 3 | SBT_NOBORDERS, reinterpret_cast<LPARAM>(((L"String Table Size: " + std::to_wstring(header.stringTableSize) + L"B").c_str())));
 					}
 					else
-						MessageBox(hwndMain, _T("This is not a valid DBC file."), _T("Error!"), MB_ICONERROR | MB_OK);
+						MessageBox(hwndMain, L"This is not a valid DBC file.", L"Error!", MB_ICONERROR | MB_OK);
 				}
 			}
 		}

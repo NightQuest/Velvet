@@ -50,10 +50,10 @@ public:
 	DBCFile();
 	~DBCFile();
 
-	bool open(const tstring& filename);
-	bool save(const tstring& filename);
+	bool open(const std::wstring& filename);
+	bool save(const std::wstring& filename);
 	
-	void setColumnFormat(const tstring& format);
+	void setColumnFormat(const std::wstring& format);
 	DBCHeader getHeader() { return fileHeader; }
 	DBCRow* getRow(unsigned int row);
 	DBCRow* getRowById(unsigned int id);

@@ -39,7 +39,7 @@ DBCFile::~DBCFile()
 	}
 }
 
-bool DBCFile::open(const tstring& filename)
+bool DBCFile::open(const std::wstring& filename)
 {
 	if( filename.empty() )
 		return false;
@@ -117,12 +117,12 @@ bool DBCFile::open(const tstring& filename)
 	return true;
 }
 
-bool DBCFile::save(const tstring& filename)
+bool DBCFile::save(const std::wstring& filename)
 {
 	return false;
 }
 
-void DBCFile::setColumnFormat(const tstring& format)
+void DBCFile::setColumnFormat(const std::wstring& format)
 {
 	if( columnFormat != nullptr )
 	{
@@ -138,11 +138,11 @@ void DBCFile::setColumnFormat(const tstring& format)
 	unsigned int totalRowSize = 0;
 	for( size_t x = 0; x < format.length(); x++ )
 	{
-		if( format[x] == _T('b') )
+		if( format[x] == L'b' )
 			columnFormat[x].size = 1;
-		else if( format[x] == _T('s') )
+		else if( format[x] == L's' )
 			columnFormat[x].size = 2;
-		else if( format[x] == _T('i') || format[x] == _T('f') )
+		else if( format[x] == L'i' || format[x] == L'f' )
 			columnFormat[x].size = 4;
 
 		if( x > 0 )

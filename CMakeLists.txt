@@ -25,7 +25,6 @@ ENDMACRO(ADD_MSVC_PRECOMPILED_HEADER)
 
 set(header_files
 	src/DBCFile.h
-	src/tcharness.h
 	src/Velvet.h)
 
 set(res_files
