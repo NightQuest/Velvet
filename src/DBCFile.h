@@ -52,7 +52,7 @@ public:
 
 	bool open(const std::wstring& filename);
 	bool save(const std::wstring& filename);
-	
+
 	void setColumnFormat(const std::wstring& format);
 	DBCHeader getHeader() { return fileHeader; }
 	DBCRow* getRow(unsigned int row);

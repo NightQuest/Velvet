@@ -50,7 +50,7 @@ bool DBCFile::open(const std::wstring& filename)
 
 	// Verify the file is big enough for a header
 	LARGE_INTEGER fileSize;
-	if( GetFileSizeEx(hFile, &fileSize) == 0 || fileSize.QuadPart <= sizeof(DBCHeader))
+	if( GetFileSizeEx(hFile, &fileSize) == 0 || fileSize.QuadPart <= sizeof(DBCHeader) )
 	{
 		CloseHandle(hFile);
 		hFile = INVALID_HANDLE_VALUE;
@@ -130,10 +130,10 @@ void DBCFile::setColumnFormat(const std::wstring& format)
 		columnFormat = nullptr;
 	}
 
-	if( (columnFormat = new DBCColumn[fileHeader.columns-1]) == nullptr )
+	if( (columnFormat = new DBCColumn[fileHeader.columns - 1]) == nullptr )
 		return;
 
-	memset(columnFormat, 0, fileHeader.columns-1);
+	memset(columnFormat, 0, fileHeader.columns - 1);
 
 	unsigned int totalRowSize = 0;
 	for( size_t x = 0; x < format.length(); x++ )
@@ -146,7 +146,7 @@ void DBCFile::setColumnFormat(const std::wstring& format)
 			columnFormat[x].size = 4;
 
 		if( x > 0 )
-			columnFormat[x].position = columnFormat[x-1].position + columnFormat[x-1].size;
+			columnFormat[x].position = columnFormat[x - 1].position + columnFormat[x - 1].size;
 
 		totalRowSize += columnFormat[x].size;
 	}
